@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 # Baca citra biner
-input_image = cv2.imread('biner.jpeg', cv2.IMREAD_GRAYSCALE)
+input_image = cv2.imread('filling.jpg', cv2.IMREAD_GRAYSCALE)
 
 # Tugas Pertama: Dilasi
 def dilate_image(image, kernel_size):

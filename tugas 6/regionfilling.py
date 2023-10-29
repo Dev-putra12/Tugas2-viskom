@@ -1,28 +1,37 @@
 import cv2
 import numpy as np
 
-# Baca citra asli
-input_image = cv2.imread('biner.jpeg', cv2.IMREAD_COLOR)
+# Baca citra biner sebagai citra grayscale
+input_image = cv2.imread('filling.jpg', cv2.IMREAD_GRAYSCALE)
 
-# Salin citra asli ke citra target untuk dilakukan region filling
+# Salin citra asli ke citra target untuk region filling
 target_image = input_image.copy()
 
 # Tentukan titik awal (seed) untuk region filling
 seed_point = (100, 100)  # Koordinat (x, y) seed point
+target_value = 1  # Nilai yang akan digunakan untuk mengisi wilayah
 
-# Tentukan warna atau nilai yang akan digunakan untuk mengisi wilayah
-fill_color = (0, 0, 255)  # Warna merah, bisa disesuaikan sesuai format (B, G, R)
+def region_filling(image, seed, target_value):
+    stack = [seed]
 
-# Buat elemen struktural (kernel) untuk operasi dilasi
-kernel = np.ones((3, 3), np.uint8)
+    while stack:
+        current_seed = stack.pop()
+        x, y = current_seed
 
-# Lakukan region filling menggunakan operasi dilasi
-while True:
-    prev_target_image = target_image.copy()
-    target_image = cv2.dilate(target_image, kernel, anchor=seed_point, iterations=1)
-    # Jika tidak ada perubahan pada citra target, proses selesai
-    if (target_image == prev_target_image).all():
-        break
+        if x < 0 or x >= image.shape[1] or y < 0 or y >= image.shape[0]:
+            continue
+
+        if image[y, x] == target_value:
+            continue
+
+        image[y, x] = target_value
+
+        neighbors = [(1, 0), (-1, 0), (0, 1), (0, -1)]
+        for dx, dy in neighbors:
+            stack.append((x + dx, y + dy))
+
+# Panggil fungsi region filling
+region_filling(target_image, seed_point, target_value)
 
 # Tampilkan citra asli dan hasil region filling
 cv2.imshow('Citra Asli', input_image)

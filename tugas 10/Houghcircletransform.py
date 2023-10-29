@@ -1,28 +1,32 @@
 import cv2
 import numpy as np
 
-# Baca citra
-image = cv2.imread('biner.jpeg', cv2.IMREAD_COLOR)
+# Baca citra biner sebagai citra grayscale
+input_image = cv2.imread('biner.jpeg', cv2.IMREAD_GRAYSCALE)
 
-# Konversi citra ke grayscale
-gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+# Salin citra asli ke citra target untuk region filling
+target_image = input_image.copy()
 
-# Reduksi noise pada citra dengan Gaussian blur
-gray = cv2.GaussianBlur(gray, (9, 9), 2)
+# Tentukan titik awal (seed) untuk region filling
+seed_point = (100, 100)  # Koordinat (x, y) seed point
+target_image[seed_point[1], seed_point[0]] = 1
 
-# Deteksi lingkaran dengan Hough Circle Transform
-circles = cv2.HoughCircles(gray, cv2.HOUGH_GRADIENT, dp=1,
-                           minDist=20, param1=50, param2=30, minRadius=0, maxRadius=0)
+# Buat elemen struktural (kernel) untuk operasi dilasi (strel simetrik)
+kernel = np.array([[1, 1, 1],
+                  [1, 1, 1],
+                  [1, 1, 1]], np.uint8)
 
-if circles is not None:
-    circles = np.uint16(np.around(circles))
-    for i in circles[0, :]:
-        center = (i[0], i[1])
-        cv2.circle(image, center, 1, (0, 100, 100), 3)
-        radius = i[2]
-        cv2.circle(image, center, radius, (0, 255, 0), 2)
+# Lakukan region filling menggunakan operasi dilasi dan interseksi
+while True:
+    prev_target_image = target_image.copy()
+    dilated_image = cv2.dilate(target_image, kernel, iterations=1)
+    target_image = np.minimum(dilated_image, input_image)
+    # Jika tidak ada perubahan pada citra target, proses selesai
+    if np.array_equal(target_image, prev_target_image):
+        break
 
-# Tampilkan citra asli dan hasil deteksi lingkaran
-cv2.imshow('Citra Asli', image)
+# Tampilkan citra asli dan hasil region filling
+cv2.imshow('Citra Asli', input_image)
+cv2.imshow('Hasil Region Filling', target_image * 255)  # Mengecilkan hasil ke 0 dan 255
 cv2.waitKey(0)
 cv2.destroyAllWindows()

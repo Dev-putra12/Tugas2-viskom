@@ -25,7 +25,7 @@ def skeletonize(image):
 
 
 # Baca citra biner
-input_image = cv2.imread('biner.jpeg', cv2.IMREAD_GRAYSCALE)
+input_image = cv2.imread('filling.jpg', cv2.IMREAD_GRAYSCALE)
 
 # Lakukan skeletonization
 skeleton_image = skeletonize(input_image)

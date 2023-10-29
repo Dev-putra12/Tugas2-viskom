@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 # Baca citra biner
-input_image = cv2.imread('hitormiss.jpg', cv2.IMREAD_GRAYSCALE)
+input_image = cv2.imread('biner.jpeg', cv2.IMREAD_GRAYSCALE)
 
 # Buat elemen struktural untuk pola Hit
 kernel_hit = np.array([[0, 1, 0],
